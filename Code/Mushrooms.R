@@ -10,12 +10,11 @@
 #someone could die. This must be avoided ofcourse...
 
 rm(list = ls())
-
 library(dplyr)
 library(tidyr)
 library(caret)
 
-setwd("C:/Users/Jeroen/Downloads")
+setwd("C:/Users/Jeroen/Desktop/Ubiqum/Mushroom Hackathon/Dataset")
 
 #read mushroom trainindata
 mushrooms <- readRDS("train.rds")
@@ -89,9 +88,6 @@ C5Fit <- train(class ~ .,
                 trControl = fitControl)
 
 
-
-save(C5Fit, file = "Jeroen_mushroom2.rda")
-
 #See the most important predictors
 predictions <- predict(C5Fit, newdata = mushrooms_test)
 
@@ -109,8 +105,9 @@ mushrooms_errors <- mushrooms_test %>% filter(predictions == "e" & class == "p")
 #models a decision tree untill poison mushrooms are not predicted to be edible
 while (specificity != 1){
   
-  mushrooms_errors <- mushrooms_errors %>% select(-"predictions")
   
+  #add errors of previous model to the full dataset
+  mushrooms_errors <- mushrooms_errors %>% select(-"predictions")
   mushrooms <- bind_rows(mushrooms, mushrooms_errors)
   
   #make a data partition
@@ -169,3 +166,6 @@ while (specificity != 1){
   mushrooms_errors <- mushrooms_test %>% filter(predictions == "e" & class == "p")
   
 }
+
+#save model
+save(C5Fit, file = "Jeroen_mushrooms.rda")
